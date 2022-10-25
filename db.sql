@@ -11,5 +11,16 @@ CREATE TABLE users(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
+CREATE TABLE products(
+    id SERIAL PRIMARY KEY,
+    pname STRING NOT NULL,
+    pcategory STRING NOT NULL,
+    price INT NOT NULL,
+    pcolor STRING NOT NULL,
+    psize STRING NOT NULL,
+    stocks INT NOT NULL,
+    pdescript STRING NOT NULL,
+    pimageurl STRING NOT NULL,
+    psales INT NOT NULL
+);
 
