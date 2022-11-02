@@ -5,7 +5,7 @@ const getProducts = async (req, res) => {
     const data = await client.select().from('products').orderBy('id', 'desc')
     res.json(data)
   } catch (error) {
-    res.json({ error: true, message: error })
+    res.json({ error: true, message: error.stack })
   }
 }
 const getOneProduct = async (req, res) => {
