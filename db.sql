@@ -20,6 +20,7 @@ CREATE TABLE products(
     psize STRING NOT NULL,
     stocks INT NOT NULL,
     pdescript STRING NOT NULL,
+    pstatus STRING NOT NULL,
     pimageurl STRING NOT NULL,
     psales INT NOT NULL
 );
