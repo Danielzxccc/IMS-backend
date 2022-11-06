@@ -2,7 +2,11 @@ const client = require('../config/dbConfig')
 
 const getProducts = async (req, res) => {
   try {
-    const data = await client.select().from('products').orderBy('id', 'desc')
+    const data = await client
+      .select()
+      .from('products')
+      .where('active', 1)
+      .orderBy('id', 'desc')
     res.json(data)
   } catch (error) {
     res.json({ error: true, message: error.stack })
@@ -15,6 +19,19 @@ const getOneProduct = async (req, res) => {
     res.json(data)
   } catch (error) {
     res.json({ error: true, message: error })
+  }
+}
+
+const getArchives = async (req, res) => {
+  try {
+    const data = await client
+      .select()
+      .from('products')
+      .where('active', 0)
+      .orderBy('id', 'desc')
+    res.json(data)
+  } catch (error) {
+    res.json({ error: true, message: error.stack })
   }
 }
 const createProduct = async (req, res) => {
@@ -43,7 +60,9 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const id = req.params.id
-    const query = await client('products').where('id', id).del()
+    const query = await client('products').where('id', id).update({
+      active: '0',
+    })
     if (query) {
       res.json({ message: 'deleted successfully' })
     } else {
@@ -56,6 +75,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
   getProducts,
   getOneProduct,
+  getArchives,
   createProduct,
   updateProduct,
   deleteProduct,

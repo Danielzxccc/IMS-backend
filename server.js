@@ -29,5 +29,6 @@ app.use('/profiles', require('./routes/profileRoutes'))
 app.use('/users', require('./routes/usersRoutes'))
 app.use('/auth', require('./routes/authRoutes'))
 app.use('/products', require('./routes/productRoutes'))
+app.use('/paidorders', require('./routes/paidOrdersRoutes'))
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

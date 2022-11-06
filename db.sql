@@ -20,8 +20,32 @@ CREATE TABLE products(
     psize STRING NOT NULL,
     stocks INT NOT NULL,
     pdescript STRING NOT NULL,
-    pstatus STRING NOT NULL,
     pimageurl STRING NOT NULL,
-    psales INT NOT NULL
+    pimagename STRING NOT NULL,
+    psales INT NOT NULL,
+    active INT DEFAULT 1
+);
+
+CREATE TABLE paidorders(
+    id SERIAL PRIMARY KEY,
+    cname STRING NOT NULL,
+    product_id INT,
+    st_name STRING NOT NULL,
+    dmethod STRING NOT NULL,
+    pmethod STRING NOT NULL,
+    tprice INT NOT NULL,
+    quantity INT NOT NULL,
+    street STRING,
+    barangay STRING,
+    city STRING ,
+    region STRING,
+    country STRING,
+    postal INT,
+    contact INT NOT NULL,
+    active INT DEFAULT 1,
+    date_added DATE DEFAULT CURRENT_DATE,
+    CONSTRAINT fk_product_id
+        FOREIGN KEY(product_id)
+            REFERENCES products(id)
 );
 
