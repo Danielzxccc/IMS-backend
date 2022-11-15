@@ -7,6 +7,8 @@ router.get('/get/:id', productsController.getOneProduct)
 router.get('/archive', productsController.getArchives)
 router.post('/create', productsController.createProduct)
 router.put('/update/:id', productsController.updateProduct)
+router.put('/unarchive/:id', productsController.unarchiveProduct)
+router.put('/multiplearchive', productsController.multiplearchive)
 router.delete('/delete/:id', productsController.deleteProduct)
 
 module.exports = router

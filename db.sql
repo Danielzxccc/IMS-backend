@@ -24,6 +24,7 @@ CREATE TABLE products(
     pimagename STRING NOT NULL,
     psales INT NOT NULL,
     active INT DEFAULT 1
+    date_archive date DEFAULT NULL,
 );
 
 CREATE TABLE paidorders(
@@ -43,6 +44,7 @@ CREATE TABLE paidorders(
     postal INT,
     contact INT NOT NULL,
     active INT DEFAULT 1,
+    date_archive date DEFAULT NULL,
     date_added DATE DEFAULT CURRENT_DATE,
     CONSTRAINT fk_product_id
         FOREIGN KEY(product_id)

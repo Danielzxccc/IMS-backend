@@ -2,12 +2,55 @@ const client = require('../config/dbConfig')
 
 const getPaidOrders = async (req, res) => {
   try {
-    const data = await client.select().from('paidorders')
+    const data = await client
+      .select(
+        'paidorders.id',
+        'paidorders.cname',
+        'paidorders.product_id',
+        'paidorders.st_name',
+        'paidorders.dmethod',
+        'paidorders.pmethod',
+        'paidorders.tprice',
+        'paidorders.quantity',
+        'paidorders.street',
+        'paidorders.barangay',
+        'paidorders.city',
+        'paidorders.region',
+        'paidorders.country',
+        'paidorders.postal',
+        'paidorders.contact',
+        'paidorders.active',
+        'paidorders.date_added',
+        'products.pname',
+        'products.pcategory',
+        'products.price',
+        'products.pcolor',
+        'products.psize',
+        'products.pimageurl',
+        'products.pimagename'
+      )
+      .from('paidorders')
+      .join('products', { 'paidorders.product_id': 'products.id' })
     res.json(data)
   } catch (error) {
     res.json({ error: true, message: error.stack })
   }
 }
+
+const getOnePaidOrder = async (req, res) => {
+  try {
+    const id = req.params.id
+    const data = await client
+      .select('*')
+      .from('paidorders')
+      .join('products', { 'products.id': 'paidorders.product_id' })
+      .where('paidorders.id', id)
+    res.json(data)
+  } catch (error) {
+    res.status(400).json({ error: true, message: error.stack })
+  }
+}
+
 const createPaidOrders = async (req, res) => {
   try {
     const data = req.body
@@ -25,7 +68,7 @@ const createPaidOrders = async (req, res) => {
       })
     res.json({ message: 'Added Successfully' })
   } catch (error) {
-    res.status(400).json({ error: true, message: error })
+    res.status(400).json({ error: true, message: error.stack })
   }
 }
 
@@ -46,7 +89,7 @@ const getReportChartData = async (req, res) => {
       November: 0,
       December: 0,
     }
-    const calculateSales = data.map((item) => {
+    data.forEach((item) => {
       const date = new Date(item.date_added)
       const month = date.getMonth()
       switch (month) {
@@ -89,7 +132,6 @@ const getReportChartData = async (req, res) => {
         default:
           break
       }
-      return
     })
     res.json([dataChart])
   } catch (error) {
@@ -97,4 +139,24 @@ const getReportChartData = async (req, res) => {
   }
 }
 
-module.exports = { getPaidOrders, getReportChartData, createPaidOrders }
+const getBestSellingProduct = async (req, res) => {
+  try {
+    const data = await client
+      .select('pimageurl')
+      .from('products')
+      .whereRaw(
+        'id = (SELECT product_id from paidorders GROUP BY product_id ORDER BY COUNT(quantity) DESC LIMIT 1)'
+      )
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(400).json({ error: true, message: error.stack })
+  }
+}
+
+module.exports = {
+  getPaidOrders,
+  getOnePaidOrder,
+  getReportChartData,
+  createPaidOrders,
+  getBestSellingProduct,
+}

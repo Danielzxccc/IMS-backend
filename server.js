@@ -5,11 +5,13 @@ const PORT = 3500
 const cors = require('cors')
 const corsOptions = require('./config/corsOptions')
 const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
 const session = require('express-session')
 
 //middlewares
 app.use(express.json(corsOptions))
 app.use(cors(corsOptions))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
 //session config
