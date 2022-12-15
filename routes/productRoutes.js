@@ -10,5 +10,6 @@ router.put('/update/:id', productsController.updateProduct)
 router.put('/unarchive/:id', productsController.unarchiveProduct)
 router.put('/multiplearchive', productsController.multiplearchive)
 router.delete('/delete/:id', productsController.deleteProduct)
+router.get('/reports', productsController.productReports)
 
 module.exports = router

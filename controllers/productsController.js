@@ -114,6 +114,18 @@ const multiplearchive = async (req, res) => {
   }
 }
 
+// include all column
+const productReports = async (req, res) => {
+  try {
+    const query = await client.raw(
+      'SELECT products.id, products.pname, products.pcategory, products.price, products.pcolor, products.psize, products.stocks, products.pdescript, products.pimageurl, SUM(paidorders.quantity) as qtysold, SUM(paidorders.tprice) as productsales, COUNT(paidorders.id) as orders FROM products LEFT JOIN paidorders ON paidorders.product_id = products.id WHERE products.active = 1 GROUP BY products.id ORDER BY products.id DESC '
+    )
+    res.status(200).send(query.rows)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error: true, message: error })
+  }
+}
 module.exports = {
   getProducts,
   getOneProduct,
@@ -123,4 +135,5 @@ module.exports = {
   deleteProduct,
   unarchiveProduct,
   multiplearchive,
+  productReports,
 }

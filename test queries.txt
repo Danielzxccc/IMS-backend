@@ -1,0 +1,7 @@
+#QUERIES FOR PRODUCT SALES AND QUANTITY SOLD
+
+SELECT products.id, products.pname, products.pcategory, products.price, products.pcolor, products.psize, products.stocks, SUM(paidorders.quantity) as qtysold, SUM(paidorders.tprice) as productsales FROM products LEFT JOIN paidorders ON paidorders.product_id = products.id GROUP BY products.id;
+
+ const query = await client.raw(
+      'SELECT products.id, products.pname, products.pcategory, products.price, products.pcolor, products.psize, products.stocks, SUM(paidorders.quantity) as qtysold, SUM(paidorders.tprice) as productsales FROM products LEFT JOIN paidorders ON paidorders.product_id = products.id WHERE products.active = 1 GROUP BY products.id ORDER BY products.id DESC '
+    )

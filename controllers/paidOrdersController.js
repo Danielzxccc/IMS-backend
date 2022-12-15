@@ -1,7 +1,52 @@
 const client = require('../config/dbConfig')
+const {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  startOfYear,
+  endOfYear,
+  getDate,
+} = require('date-fns')
 
 const getPaidOrders = async (req, res) => {
   try {
+    let dateRange = []
+    const { range } = req.body
+    const today = new Date()
+    //start range
+    const startDefault = new Date('2015-1-1')
+    const endDefault = new Date('2025-12-25')
+    //monthly range
+    const startMonth = startOfMonth(new Date())
+    const endMonth = endOfMonth(new Date())
+    //weekly range
+    const startWeek = startOfWeek(new Date())
+    const endWeek = endOfWeek(new Date())
+    //yearly
+    const startYear = startOfYear(new Date())
+    const endYear = endOfYear(new Date())
+
+    switch (range) {
+      case 'DEFAULT':
+        dateRange.push(startDefault, endDefault)
+        break
+      case 'DAILY':
+        dateRange.push(today, today)
+        break
+      case 'WEEKLY':
+        dateRange.push(startWeek, endWeek)
+        break
+      case 'MONTHLY':
+        dateRange.push(startMonth, endMonth)
+        break
+      case 'ANNUAL':
+        dateRange.push(startYear, endYear)
+        break
+      default:
+        break
+    }
+
     const data = await client
       .select(
         'paidorders.id',
@@ -30,8 +75,10 @@ const getPaidOrders = async (req, res) => {
         'products.pimagename'
       )
       .from('paidorders')
+      .whereBetween('date_added', dateRange)
       .join('products', { 'paidorders.product_id': 'products.id' })
-    res.json(data)
+      .orderByRaw('paidorders.date_added DESC')
+    res.status(200).json(data)
   } catch (error) {
     res.json({ error: true, message: error.stack })
   }
@@ -45,7 +92,7 @@ const getOnePaidOrder = async (req, res) => {
       .from('paidorders')
       .join('products', { 'products.id': 'paidorders.product_id' })
       .where('paidorders.id', id)
-    res.json(data)
+    res.status(200).json(data)
   } catch (error) {
     res.status(400).json({ error: true, message: error.stack })
   }
@@ -66,7 +113,7 @@ const createPaidOrders = async (req, res) => {
       .update({
         stocks: productToUpdate[0].stocks - insert[0].quantity,
       })
-    res.json({ message: 'Added Successfully' })
+    res.status(201).json({ message: 'Added Successfully' })
   } catch (error) {
     res.status(400).json({ error: true, message: error.stack })
   }
@@ -133,7 +180,7 @@ const getReportChartData = async (req, res) => {
           break
       }
     })
-    res.json([dataChart])
+    res.status(200).json([dataChart])
   } catch (error) {
     res.status(400).json({ error: true, message: error })
   }
@@ -153,10 +200,58 @@ const getBestSellingProduct = async (req, res) => {
   }
 }
 
+const getReports = async (req, res) => {
+  try {
+    const today = new Date()
+    //monthly range
+    const startMonth = startOfMonth(new Date())
+    const endMonth = endOfMonth(new Date())
+    //weekly range
+    const startWeek = startOfWeek(new Date())
+    const endWeek = endOfWeek(new Date())
+    //yearly
+    const startYear = startOfYear(new Date())
+    const endYear = endOfYear(new Date())
+
+    const data = await client.raw(
+      'SELECT (SELECT SUM(tprice) from paidorders WHERE date_added BETWEEN ? and ?) as daily, (SELECT SUM(tprice) from paidorders WHERE date_added BETWEEN ? and ?) as monthly, (SELECT SUM(tprice) from paidorders WHERE date_added BETWEEN ? and ?) as yearly, (SELECT SUM(tprice) from paidorders WHERE date_added BETWEEN ? and ?) as weekly FROM paidorders LIMIT 1;',
+      [
+        today,
+        today,
+        startMonth,
+        endMonth,
+        startYear,
+        endYear,
+        startWeek,
+        endWeek,
+      ]
+    )
+
+    res.status(200).json(data.rows)
+  } catch (error) {
+    res.status(400).json({ error: true, message: error.stack })
+  }
+}
+
+const checkLowStocks = async (req, res) => {
+  try {
+    const data = await client
+      .select('*')
+      .from('products')
+      .whereRaw('stocks <= 10 AND active = 1')
+      .orderByRaw('stocks ASC')
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(400).json({ error: true, message: error.stack })
+  }
+}
+
 module.exports = {
   getPaidOrders,
   getOnePaidOrder,
   getReportChartData,
   createPaidOrders,
   getBestSellingProduct,
+  getReports,
+  checkLowStocks,
 }
